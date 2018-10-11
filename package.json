@@ -1,0 +1,23 @@
+{
+  "name": "express-mongo-starter",
+  "version": "1.0.0",
+  "description": "A starter for an express server along with API routes and using MongoDB as database",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/prashantvikram/express-mongo-starter.git"
+  },
+  "keywords": [
+    "express",
+    "mongo"
+  ],
+  "author": "Prashant Vikram",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/prashantvikram/express-mongo-starter/issues"
+  },
+  "homepage": "https://github.com/prashantvikram/express-mongo-starter#readme"
+}
