@@ -14,6 +14,8 @@ const envVarchema = joi.object().keys({
   LOGGER_LEVEL: joi.string()
     .valid(['error', 'warn', 'info', 'verbose', 'debug', 'silly'])
     .default('info'),
+  MONGO_URL: joi.string()
+    .required(),
 });
 
 const { error, value: envVarParsed } = joi.validate(envVar.parsed, envVarchema);
@@ -24,7 +26,8 @@ if (error) {
 const config = {
   port: envVarParsed.PORT,
   dev: envVarParsed.NODE_ENV,
-  level: envVarParsed.LOGGER_LEVEL
+  level: envVarParsed.LOGGER_LEVEL,
+  mongoUrl: envVarParsed.MONGO_URL
 }
 
 module.exports = config;

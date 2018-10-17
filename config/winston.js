@@ -1,6 +1,6 @@
 var appRoot = require('app-root-path');
 var winston = require('winston');
-var level = require("../env-config").level;
+var level = require("./env-config").level;
 
 var options = {
   file: {
