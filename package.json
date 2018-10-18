@@ -27,13 +27,18 @@
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.18.3",
     "compression": "^1.7.3",
+    "connect-redis": "^3.4.0",
     "dotenv": "^6.1.0",
     "express": "^4.16.4",
+    "express-session": "^1.15.6",
     "helmet": "^3.14.0",
     "http-errors": "^1.7.1",
     "joi": "^13.7.0",
     "mongoose": "^5.3.2",
     "morgan": "^1.9.1",
+    "passport": "^0.4.0",
+    "passport-local": "^1.0.0",
+    "redis": "^2.8.0",
     "winston": "^3.1.0"
   },
   "devDependencies": {

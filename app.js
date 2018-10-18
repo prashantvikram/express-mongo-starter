@@ -7,25 +7,50 @@ var helmet        = require("helmet");
 var bodyParser    = require("body-parser");
 var fs            = require("fs");
 var mongoose      = require("mongoose");
+var redis         = require("redis");
+var passport      = require("passport");
+var session       = require("express-session");
+var redisStore    = require('connect-redis')(session);
+
 const DB_URL      = require("./config/env-config").mongoUrl;
+const SECRET      = require("./config/env-config").sessionSecret;
+
+var client = redis.createClient();
 
 const app = express();
+require("./config/passport-config")(passport);
 
-app.use(helmet());
+// connect to database
+mongoose.connect(DB_URL,
+  {
+    useCreateIndex: true,
+    useNewUrlParser: true
+  }, (err) => {
+    if (err) {
+      console.log(err.message);
+    } else {
+      console.log("Database connected");
+    }
+  }
+);
 
 // middleware
+app.use(helmet());
+
 app.use(compression());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-
-// connect to database
-mongoose.connect(DB_URL, { useNewUrlParser: true }, (err) => {
-  if (err) {
-    console.log(err.message);
-  } else {
-    console.log("Database connected");
+app.use(session({
+  secret: SECRET,
+  store: new redisStore({ host: 'localhost', port: 6379, client: client, ttl: 260 }),
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    maxAge: 24*60*60*1000
   }
-});
+}));
+app.use(passport.initialize());
+app.use(passport.session());
 
 // logging
 app.use(morgan('combined', { stream: winston.stream }));
