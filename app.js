@@ -52,13 +52,26 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
+const apiLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000, // 2 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+  message: "Too many requests from this IP",
+  handler: function (req, res) {
+    // handle requests when limit is reached
+    // could be logged using winston
+    // or saved to a redis store
+  }
+});
+
+this.app.use("/api/", apiLimiter);
+
 // logging
 app.use(morgan('combined', { stream: winston.stream }));
 
 //dynamically include routes from api
-fs.readdirSync('./api').forEach(function (file) {
+fs.readdirSync('./routes').forEach(function (file) {
   if (file.substr(-3) == '.js') {
-    let route = require('./api/' + file);
+    let route = require('./routes/' + file);
     app.use(`/${file.split(".")[0]}`, route);
   }
 });
