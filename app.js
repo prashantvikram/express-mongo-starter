@@ -11,6 +11,7 @@ var redis         = require("redis");
 var passport      = require("passport");
 var session       = require("express-session");
 var redisStore    = require('connect-redis')(session);
+var rateLimit     = require("express-rate-limit");
 
 const DB_URL      = require("./config/env-config").mongoUrl;
 const SECRET      = require("./config/env-config").sessionSecret;
@@ -63,7 +64,7 @@ const apiLimiter = rateLimit({
   }
 });
 
-this.app.use("/api/", apiLimiter);
+app.use("/api/", apiLimiter);
 
 // logging
 app.use(morgan('combined', { stream: winston.stream }));
