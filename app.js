@@ -7,16 +7,13 @@ var helmet        = require("helmet");
 var bodyParser    = require("body-parser");
 var fs            = require("fs");
 var mongoose      = require("mongoose");
-// var redis         = require("redis");
 var passport      = require("passport");
 var session       = require("express-session");
-// var redisStore    = require('connect-redis')(session);
 var rateLimit     = require("express-rate-limit");
+const MongoStore  = require('connect-mongo')(session);
 
 const DB_URL      = require("./config/env-config").mongoUrl;
 const SECRET      = require("./config/env-config").sessionSecret;
-
-// var client = redis.createClient();
 
 const app = express();
 require("./config/passport-config")(passport);
@@ -46,7 +43,7 @@ app.use(bodyParser.json());
 
 app.use(session({
   secret: SECRET,
-  // store: new redisStore({ host: 'localhost', port: 6379, client: client, ttl: 260 }),
+  store: new MongoStore({ mongooseConnection: mongoose.connection }),
   resave: true,
   saveUninitialized: true,
   cookie: {

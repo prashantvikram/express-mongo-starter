@@ -17,7 +17,6 @@ module.exports = function(passport) {
   router.post('/signin', function (req, res, next) {
     passport.authenticate('signin', function (err, user, info) {
       if (err) { return next(err); }
-
       req.login(user, err => {
         if (err) { return next(err); }
 
