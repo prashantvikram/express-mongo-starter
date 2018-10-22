@@ -1,18 +1,22 @@
 const express = require('express');
 const router = express.Router();
 
-// middleware for jwt
-router.use(function (req, res, next) {
-  // authenticate using jwt
-  next()
-});
+module.exports = function(passport) {
+  router.post('/signup', function (req, res, next) {
+    passport.authenticate('signup', function (err, user, info) {
+      if (err) { return next(err); }
 
-/**
- * adding a new user to the database
- */
-router.post('/', function (req, res, next) {
-  return res.status(200).json("data");
-});
+      return res.json(info)
+    })(req, res, next);
+  });
 
+  router.post('/signin', function (req, res, next) {
+    passport.authenticate('signin', function (err, user, info) {
+      if (err) { return next(err); }
 
-module.exports = router;
+      return res.json(info)
+    })(req, res, next);
+  });
+
+  return router
+}

@@ -1,30 +1,35 @@
 const express = require('express');
 const router = express.Router();
-var passport = require("passport");
 
-// middleware for jwt
-router.use(function (req, res, next) {
-  // authenticate using jwt
-  next()
-});
+module.exports = function(passport) {
+  router.get('/', function(req, res, next) {
+    res.json(req.session)
+  });
 
-/**
- * adding a new user to the database
- */
-router.post('/signup', function (req, res, next) {
-  passport.authenticate('signup', function (err, user, info) {
-    if (err) { return next(err); }
-    
-    return res.json(info)
-  })(req, res, next);
-});
+  router.post('/signup', function (req, res, next) {
+    passport.authenticate('signup', function (err, user, info) {
+      if (err) { return next(err); }
 
-router.post('/signin', function (req, res, next) {
-  passport.authenticate('signin', function (err, user, info) {
-    if (err) { return next(err); }
+      return res.json(info)
+    })(req, res, next);
+  });
 
-    return res.json(info)
-  })(req, res, next);
-});
+  router.post('/signin', function (req, res, next) {
+    passport.authenticate('signin', function (err, user, info) {
+      if (err) { return next(err); }
 
-module.exports = router;
+      req.login(user, err => {
+        if (err) { return next(err); }
+
+        return res.json(info)
+      });
+    })(req, res, next);
+  });
+
+  router.post('/logout', function (req, res, next) {
+    req.logout();
+    res.json({message: "logged out successfully"});
+  });
+
+  return router;
+}
