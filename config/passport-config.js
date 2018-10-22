@@ -27,7 +27,8 @@ module.exports = function (passport) {
         var newUser = new User(req.body);
         newUser.save(function (err) {
           if (err)
-            throw err;
+            return done(err);
+          
           return done(null, newUser, { message: "User was added successfully"});
         });
       }
@@ -44,7 +45,7 @@ module.exports = function (passport) {
         return done(null, false, { message: "No user found" });
       if (!user.validatePassword(password))
         return done(null, false, {message: 'Wrong password'});
-       
+        
       return done(null, user, {message: 'User logged in successfully'})
     });
   }));

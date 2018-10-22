@@ -7,16 +7,16 @@ var helmet        = require("helmet");
 var bodyParser    = require("body-parser");
 var fs            = require("fs");
 var mongoose      = require("mongoose");
-var redis         = require("redis");
+// var redis         = require("redis");
 var passport      = require("passport");
 var session       = require("express-session");
-var redisStore    = require('connect-redis')(session);
+// var redisStore    = require('connect-redis')(session);
 var rateLimit     = require("express-rate-limit");
 
 const DB_URL      = require("./config/env-config").mongoUrl;
 const SECRET      = require("./config/env-config").sessionSecret;
 
-var client = redis.createClient();
+// var client = redis.createClient();
 
 const app = express();
 require("./config/passport-config")(passport);
@@ -35,23 +35,34 @@ mongoose.connect(DB_URL,
   }
 );
 
-// middleware
-app.use(helmet());
 
+// logging
+app.use(morgan('combined', { stream: winston.stream }));
+
+app.use(helmet());
 app.use(compression());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+
 app.use(session({
   secret: SECRET,
-  store: new redisStore({ host: 'localhost', port: 6379, client: client, ttl: 260 }),
-  resave: false,
-  saveUninitialized: false,
+  // store: new redisStore({ host: 'localhost', port: 6379, client: client, ttl: 260 }),
+  resave: true,
+  saveUninitialized: true,
   cookie: {
-    maxAge: 24*60*60*1000
+    maxAge: 24 * 60 * 60 * 1000
   }
 }));
 app.use(passport.initialize());
 app.use(passport.session());
+
+//dynamically include routes from api
+fs.readdirSync('./routes').forEach(function (file) {
+  if (file.substr(-3) == '.js') {
+    let route = require('./routes/' + file)(passport);
+    app.use(`/${file.split(".")[0]}`, route);
+  }
+});
 
 const apiLimiter = rateLimit({
   windowMs: 10 * 60 * 1000, // 2 minutes
@@ -65,17 +76,6 @@ const apiLimiter = rateLimit({
 });
 
 app.use("/api/", apiLimiter);
-
-// logging
-app.use(morgan('combined', { stream: winston.stream }));
-
-//dynamically include routes from api
-fs.readdirSync('./routes').forEach(function (file) {
-  if (file.substr(-3) == '.js') {
-    let route = require('./routes/' + file);
-    app.use(`/${file.split(".")[0]}`, route);
-  }
-});
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
