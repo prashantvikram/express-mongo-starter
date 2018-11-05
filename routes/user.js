@@ -3,7 +3,7 @@ const router = express.Router();
 
 module.exports = function(passport) {
   router.get('/', function(req, res, next) {
-    res.json(req.session)
+    return res.json(req.session)
   });
 
   router.post('/signup', function (req, res, next) {
@@ -26,8 +26,13 @@ module.exports = function(passport) {
   });
 
   router.post('/logout', function (req, res, next) {
-    req.logout();
-    res.json({message: "logged out successfully"});
+    // req.logout();
+    // res.json({message: "logged out successfully"});
+    req.session.destroy(function (err) {
+      if(err) { return next(err) }
+
+      return res.json({ message: "User logged out successfully" });
+    });
   });
 
   return router;

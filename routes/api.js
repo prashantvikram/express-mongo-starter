@@ -2,20 +2,29 @@ const express = require('express');
 const router = express.Router();
 
 module.exports = function(passport) {
-  router.post('/signup', function (req, res, next) {
-    passport.authenticate('signup', function (err, user, info) {
-      if (err) { return next(err); }
+  isAuthenticated = (req, res, next) => {
+    if (req.isAuthenticated()){
+      return next();
+    }
+    else{
+      return res.status(401).json({
+        message: "Unauthenticated"
+      })
+    }
+  }
 
-      return res.json(info)
-    })(req, res, next);
+  router.get('/', isAuthenticated, function (req, res, next) {
+    res.json({
+      data: 1
+    })
   });
 
-  router.post('/signin', function (req, res, next) {
-    passport.authenticate('signin', function (err, user, info) {
-      if (err) { return next(err); }
+  router.post('/', function (req, res, next) {
+    // perform post action
 
-      return res.json(info)
-    })(req, res, next);
+    return res.status(200).json({
+      message: "Posted"
+    })
   });
 
   return router
